@@ -55,7 +55,8 @@ class Decoder(nn.Module):
         self.norm3 = nn.GroupNorm(16, 16, affine=True)
 
     # forward method
-    def forward(self, input):        input = input.reshape(-1,self.z_dim, 1, 1)
+    def forward(self, input):
+        input = input.reshape(-1,self.z_dim, 1, 1)
         x = self.norm1(self.conv1(input))
         x = F.relu(x)
 
