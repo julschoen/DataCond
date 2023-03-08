@@ -69,14 +69,14 @@ def main():
             (0.5, 0.5, 0.5))
     ])
     if args.cifar:
-        dataset1 = datasets.CIFAR10('./', train=True, download=True,
+        dataset1 = datasets.CIFAR10('../../', train=True, download=True,
                            transform=transform)
-        dataset2 = datasets.CIFAR10('./', train=False,
+        dataset2 = datasets.CIFAR10('../../', train=False,
                            transform=transform)
     else:
-        dataset1 = datasets.MNIST('./', train=True, download=True,
+        dataset1 = datasets.MNIST('../../', train=True, download=True,
                            transform=transform)
-        dataset2 = datasets.MNIST('./', train=False,
+        dataset2 = datasets.MNIST('../../', train=False,
                            transform=transform)
     train_loader = torch.utils.data.DataLoader(dataset1, shuffle=True, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
