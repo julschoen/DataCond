@@ -8,6 +8,8 @@ class Encoder(nn.Module):
     def __init__(self, params, z_dim, nfilter=128):
         super(Encoder, self).__init__()
 
+        self.z_dim = z_dim
+
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1)
         self.norm1 = nn.GroupNorm(16, 16, affine=True)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1)
@@ -15,6 +17,7 @@ class Encoder(nn.Module):
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
         self.norm3 = nn.GroupNorm(64, 64, affine=True)
         self.conv4 = nn.Conv2d(64, z_dim, kernel_size=3, stride=2, padding=1)
+
 
         self.fc1 = nn.Linear(10, z_dim)
 
@@ -29,9 +32,10 @@ class Encoder(nn.Module):
         x = F.relu(x)
         x = self.conv4(x)
 
-        x = x.view(-1, 128)
+        x = x.view(-1, self.z_dim)
         label = F.one_hot(label, num_classes=10).float()
         y = self.fc1(label)
+
         x = torch.cat((x, y), dim=1)
 
         return x
