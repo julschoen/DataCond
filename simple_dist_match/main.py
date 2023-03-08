@@ -20,7 +20,7 @@ def main():
     ### VAE
     parser.add_argument('--niter_ae', type=int, default=3000)
     parser.add_argument('--lrAE', type=float, default=1e-4)
-    parser.add_argument('--z_dim', type=int, default=512)
+    parser.add_argument('--z_dim', type=int, default=16)
     parser.add_argument('--filter', type=int, default=128)
 
     ### Synth Images
