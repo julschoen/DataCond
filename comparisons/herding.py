@@ -23,7 +23,7 @@ def pretrain(model, args, run_num):
         transforms.Resize(224)
         ])
 
-    dataset = datasets.CIFAR10('../data/', train=True, download=True, transform=transform)
+    dataset = datasets.CIFAR10('../../data/', train=True, download=True, transform=transform)
     train_loader = torch.utils.data.DataLoader(dataset, batch_size=512, shuffle=True)
 
 
