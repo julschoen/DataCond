@@ -10,7 +10,7 @@ class SimpleNet(nn.Module):
         self.fc2 = nn.Linear(in_dim//2, num_classes)
 
     def forward(self, x):
-        x = self.fc1(x.flatten())
+        x = self.fc1(x.reshape(x.shape[0], -1))
         x = F.relu(x)
         x = self.dropout(x)
         x = self.fc2(x)
