@@ -9,7 +9,7 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
 
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1)
-        self.norm1 = nn.GroupNorm(16, 16 affine=True)
+        self.norm1 = nn.GroupNorm(16, 16, affine=True)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1)
         self.norm2 = nn.GroupNorm(32, 32, affine=True)
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
