@@ -65,9 +65,7 @@ class Decoder(nn.Module):
 
         x = self.norm3(self.conv3(x))
         x = F.relu(x)
-        x = torch.tanh(self.conv4(x))
-        print(x.shape)
-        return x
+        return torch.tanh(self.conv4(x))
 
 class AE(nn.Module):
     def __init__(self, params):
