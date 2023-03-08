@@ -73,13 +73,13 @@ def main():
 
     test_kwargs = {'batch_size': args.test_batch_size}
     
-    dataset2 = datasets.CIFAR10('../data', train=False,
+    dataset2 = datasets.CIFAR10('../../data', train=False,
                        transform=transform)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
     res = []
     for i in range(10):
-        comp_dir = '../comparison_synth'
+        comp_dir = '../../comparison_synth'
         
         ## random
         targets = torch.load(os.path.join(comp_dir,f'rand_y_{i}.pt'))
@@ -98,7 +98,7 @@ def main():
             acc = test(model, device, test_loader)
             conv.append(acc)
 
-            model = ResNet18(args).to(device)
+            model = ResNet18().to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
             for epoch in range(1, 200):
@@ -106,7 +106,7 @@ def main():
             acc = test(model, device, test_loader)
             res.append(acc)
 
-            model = SimpleNet(in_dim=32).to(device)
+            model = SimpleNet(in_dim=32*32*3).to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
             for epoch in range(1, 200):
