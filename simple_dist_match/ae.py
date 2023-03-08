@@ -31,7 +31,7 @@ class Encoder(nn.Module):
         x = self.norm3(self.conv3(x))
         x = F.relu(x)
         x = self.conv4(x)
-
+        print(x.shape)
         x = x.view(-1, self.z_dim)
         label = F.one_hot(label, num_classes=10).float()
         y = self.fc1(label)
