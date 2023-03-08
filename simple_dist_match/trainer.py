@@ -126,7 +126,7 @@ class Trainer():
                     data, label = next(self.gen)
                     data = data.to(self.p.device)
                     self.ae.zero_grad()       
-                    pred, z = self.ae(data,label)
+                    pred, z = self.ae(data,label.to(self.p.device))
                     loss = self.loss(data, pred)
 
                 loss.backward()
@@ -209,7 +209,7 @@ class Trainer():
 
                 d_c = data[labels == c]
 
-                labels = torch.ones(d_c.shape[0], dtype=torch.long)*c
+                labels = torch.ones(d_c.shape[0], dtype=torch.long, device=self.p.device)*c
                 ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
                 with torch.autocast(device_type=self.p.device, dtype=torch.float16):
                     ## AE
