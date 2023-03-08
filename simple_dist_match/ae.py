@@ -36,6 +36,8 @@ class Encoder(nn.Module):
         label = F.one_hot(label, num_classes=10).float()
         y = self.fc1(label)
 
+        print(x.shape, y.shape)
+
         x = torch.cat((x, y), dim=1)
 
         return x
