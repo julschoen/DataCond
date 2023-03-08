@@ -60,7 +60,7 @@ def herding_resnet():
     parser.add_argument('--num_ims', type=int, default=10)
     parser.add_argument('--num_classes', type=int, default=10)
     parser.add_argument('--device', type=str, default='cuda')
-    parser.add_argument('--log_dir', type=str, default='../comparison_synth')
+    parser.add_argument('--log_dir', type=str, default='../../comparison_synth')
 
     # Pretrain
     parser.add_argument('--epochs', type=int, default=5)
@@ -83,7 +83,7 @@ def herding_resnet():
             S = torch.zeros((args.num_classes*args.num_ims, 3, 32, 32), dtype=torch.float)
             for c in range(args.num_classes):
                 print(f'### Class {c} ###')
-                X = torch.load(os.path.join('../data/', f'data_class_{c}.pt'))
+                X = torch.load(os.path.join('../../data/', f'data_class_{c}.pt'))
                 mu = resnet(X).mean(dim=0)
 
                 U = X.clone()
