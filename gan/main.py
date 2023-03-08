@@ -43,10 +43,10 @@ def main():
             (0.5, 0.5, 0.5))
         ])
     if args.cifar:
-        dataset1 = datasets.CIFAR10('../data/', train=True, download=True,
+        dataset1 = datasets.CIFAR10('../../data/', train=True, download=True,
                            transform=transform)
     else:
-        dataset1 = datasets.MNIST('../data/', train=True, download=True,
+        dataset1 = datasets.MNIST('../../data/', train=True, download=True,
                            transform=transform)
     train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
 
