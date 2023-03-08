@@ -4,7 +4,7 @@ from torchvision import datasets, transforms
 import os
 
 
-comp_dir = '../comparison_synth'
+comp_dir = '../../comparison_synth'
 
 def save(file_name, data):
         file_name = os.path.join(comp_dir, file_name)
@@ -20,7 +20,7 @@ def make_random():
             (0.5, 0.5, 0.5))
     ])
     
-    dataset1 = datasets.CIFAR10('../data/', train=True, download=True,
+    dataset1 = datasets.CIFAR10('../../data/', train=True, download=True,
                        transform=transform)
     train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
 
