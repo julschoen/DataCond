@@ -116,7 +116,7 @@ def main():
         train(args, model, device, train_loader, optimizer, epoch)
     test(model, device, test_loader)
 
-    model = ResNet18(args).to(device)
+    model = ResNet18().to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     for epoch in range(1, 200):
