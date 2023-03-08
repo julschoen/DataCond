@@ -4,8 +4,12 @@ import torchvision.utils as vutils
 from carbontracker.tracker import CarbonTracker
 
 import os
+
+import sys;
+sys.path.append("../") 
+
 from fid import fid, get_activations
-from mmd import mix_rbf_mmd2
+from utils.mmd import mix_rbf_mmd2
 from inception import InceptionV3
 
 

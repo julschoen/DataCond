@@ -6,6 +6,9 @@ import os
 import random
 import argparse
 
+import sys;
+sys.path.append("../") 
+
 from utils.classifiers import ConvNet
 
 class Trainer():

@@ -5,6 +5,9 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms
 import numpy as np
 
+import sys;
+sys.path.append("../") 
+
 from utils.classifiers import ConvNet, ResNet18, SimpleNet
 
 def train(args, model, device, train_loader, optimizer, epoch):

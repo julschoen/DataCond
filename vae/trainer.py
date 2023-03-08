@@ -6,6 +6,10 @@ import os
 import math
 
 from vae import ResVAE, Upsampler
+
+import sys;
+sys.path.append("../") 
+
 from utils.mmd import mix_rbf_mmd2, mix_rbf_mmd2_and_ratio
 
 class Trainer():

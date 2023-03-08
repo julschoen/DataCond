@@ -7,6 +7,9 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 import torch.utils.data as data_utils
 
+import sys;
+sys.path.append("../") 
+
 from utils.classifiers import ConvNet, ResNet18, SimpleNet
 
 

@@ -2,6 +2,10 @@ import torch
 import math
 from torch.nn.functional import adaptive_avg_pool2d
 from inception import InceptionV3
+
+import sys;
+sys.path.append("../") 
+
 from utils.sqrtm import sqrtm
 
 def calculate_frechet_distance(X, mu_Y, E_Y, cov_Y):
