@@ -109,7 +109,7 @@ def main():
             acc = test(model, device, test_loader)
             res.append(acc)
 
-            model = SimpleNet(in_dim=32).to(device)
+            model = SimpleNet(in_dim=32*32*3).to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
             for epoch in range(1, 200):
