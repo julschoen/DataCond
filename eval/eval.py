@@ -123,7 +123,7 @@ def main():
         train(args, model, device, train_loader, optimizer, epoch)
     test(model, device, test_loader)
 
-    model = SimpleNet(in_dim=32).to(device)
+    model = SimpleNet(in_dim=32*32*3).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     for epoch in range(1, 200):
