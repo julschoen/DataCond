@@ -9,9 +9,12 @@ import os
 from cdcgan import Discriminator as DCGAN
 from biggan import Discriminator as BigGAN
 
-from gan.utils.mmd import mix_rbf_mmd2, mix_rbf_mmd2_and_ratio
-from gan.utils.flows import AffineHalfFlow
-from gan.utils.fid import calculate_frechet_distance as FID
+import sys;
+sys.path.append("../") 
+
+from utils.mmd import mix_rbf_mmd2, mix_rbf_mmd2_and_ratio
+from utils.flows import AffineHalfFlow
+from utils.fid import calculate_frechet_distance as FID
 
 
 class Trainer():
