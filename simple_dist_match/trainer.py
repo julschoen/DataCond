@@ -50,7 +50,7 @@ class Trainer():
 
     def init_ims(self):
         for c in range(10):
-            X = torch.load(os.path.join('../data/', f'data_class_{c}.pt'))
+            X = torch.load(os.path.join('../../data/', f'data_class_{c}.pt'))
             perm = torch.randperm(X.shape[0])[:self.p.num_ims]
             xc = X[perm]
             self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims] = xc
