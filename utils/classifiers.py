@@ -14,7 +14,7 @@ class SimpleNet(nn.Module):
         x = F.relu(x)
         x = self.dropout(x)
         x = self.fc2(x)
-        return F.log_softmax(out, dim=1)
+        return F.log_softmax(x, dim=1)
 
 class ConvNet(nn.Module):
     def __init__(self, params, num_classes=10, net_width=128, net_depth=3, net_act='relu', net_norm='instancenorm', net_pooling='avgpooling', cl=True):
