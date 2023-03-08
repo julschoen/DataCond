@@ -36,9 +36,7 @@ class ConvNet(nn.Module):
         out = out.view(out.size(0), -1)
         if self.cl:
             out = self.classifier(out)
-            print(out.shape)
             out = F.log_softmax(out, dim=1)
-            print(out.shape)
         return out
 
     def _get_activation(self, net_act):
