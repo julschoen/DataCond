@@ -16,7 +16,7 @@ class Encoder(nn.Module):
         self.norm2 = nn.GroupNorm(32, 32, affine=True)
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
         self.norm3 = nn.GroupNorm(64, 64, affine=True)
-        self.conv4 = nn.Conv2d(64, z_dim, kernel_size=3, stride=2, padding=1)
+        self.conv4 = nn.Conv2d(64, z_dim, kernel_size=3, stride=2, padding=0)
 
 
         self.fc1 = nn.Linear(10, z_dim)
