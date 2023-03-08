@@ -177,7 +177,7 @@ def main():
             (0.5, 0.5, 0.5), 
             (0.5, 0.5, 0.5))
         ])
-    dataset1 = datasets.CIFAR10('../data/', train=True, download=True,
+    dataset1 = datasets.CIFAR10('../../data/', train=True, download=True,
                         transform=transform)
     
 
