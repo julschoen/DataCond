@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 class SimpleNet(nn.Module):
     def __init__(self, in_dim, num_classes=10):
-        super(Net, self).__init__()
+        super(SimpleNet, self).__init__()
         self.dropout = nn.Dropout(0.5)
         self.fc1 = nn.Linear(in_dim, in_dim//2)
         self.fc2 = nn.Linear(in_dim//2, num_classes)
