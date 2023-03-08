@@ -44,8 +44,8 @@ class Decoder(nn.Module):
     # initializers
     def __init__(self, z_dim, nfilter=128):
         super(Decoder, self).__init__()
-        self.z_dim = z_dim
-        self.conv1 = nn.ConvTranspose2d(z_dim, 64, kernel_size=4, stride=2, padding=1)
+        self.z_dim = 2*z_dim
+        self.conv1 = nn.ConvTranspose2d(self.z_dim, 64, kernel_size=4, stride=2, padding=1)
         self.conv2 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1)
         self.conv3 = nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1)
         self.conv4 = nn.ConvTranspose2d(16, 3, kernel_size=4, stride=2, padding=1)
@@ -55,9 +55,7 @@ class Decoder(nn.Module):
         self.norm3 = nn.GroupNorm(16, 16, affine=True)
 
     # forward method
-    def forward(self, input):
-        print(input.shape)
-        input = input.reshape(-1,self.z_dim, 1, 1)
+    def forward(self, input):        input = input.reshape(-1,self.z_dim, 1, 1)
         x = self.norm1(self.conv1(input))
         x = F.relu(x)
 
@@ -66,8 +64,9 @@ class Decoder(nn.Module):
 
         x = self.norm3(self.conv3(x))
         x = F.relu(x)
-        
-        return torch.tanh(self.conv4(x))
+        x = torch.tanh(self.conv4(x))
+        print(x.shape)
+        return x
 
 class AE(nn.Module):
     def __init__(self, params):
