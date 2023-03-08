@@ -31,12 +31,10 @@ class Encoder(nn.Module):
         x = self.norm3(self.conv3(x))
         x = F.relu(x)
         x = self.conv4(x)
-        print(x.shape)
+
         x = x.view(-1, self.z_dim)
         label = F.one_hot(label, num_classes=10).float()
         y = self.fc1(label)
-
-        print(x.shape, y.shape)
 
         x = torch.cat((x, y), dim=1)
 
@@ -58,6 +56,7 @@ class Decoder(nn.Module):
 
     # forward method
     def forward(self, input):
+        print(input.shape)
         input = input.reshape(-1,self.z_dim, 1, 1)
         x = self.norm1(self.conv1(input))
         x = F.relu(x)
