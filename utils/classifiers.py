@@ -10,13 +10,11 @@ class SimpleNet(nn.Module):
         self.fc2 = nn.Linear(in_dim//2, num_classes)
 
     def forward(self, x):
-        x = self.fc1(x)
+        x = self.fc1(x.flatten())
         x = F.relu(x)
         x = self.dropout(x)
         x = self.fc2(x)
-        print(x.shape)
         x = F.log_softmax(x, dim=1)
-        print(x.shape)
         return x
 
 class ConvNet(nn.Module):
