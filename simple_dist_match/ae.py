@@ -30,6 +30,7 @@ class Encoder(nn.Module):
         x = self.conv4(x)
 
         x = x.view(-1, 128)
+        label = F.one_hot(label, num_classes=10)
         y = self.fc1(label)
         x = torch.cat((x, y), dim=1)
 
