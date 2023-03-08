@@ -39,7 +39,7 @@ class Decoder(nn.Module):
     # initializers
     def __init__(self, z_dim, nfilter=128):
         super(Decoder, self).__init__()
-
+        self.z_dim = z_dim
         self.conv1 = nn.ConvTranspose2d(z_dim, 64, kernel_size=4, stride=2, padding=1)
         self.conv2 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1)
         self.conv3 = nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1)
@@ -51,6 +51,7 @@ class Decoder(nn.Module):
 
     # forward method
     def forward(self, input):
+        input = input.reshape(-1,self.z_dim, 1, 1)
         x = self.norm1(self.conv1(input))
         x = F.relu(x)
 
