@@ -132,7 +132,7 @@ class Decoder(nn.Module):
         self.res_up_block3 = ResUp(ch * 2, ch)
         self.conv_out = nn.Conv2d(ch, channels, 3, 1, 1)
         self.act_fnc = nn.ELU()
-        self.z_dim = latent_channels
+        self.z_dim = 2*latent_channels
 
     def forward(self, x):
         x = x.reshape(-1,self.z_dim, 1, 1)
