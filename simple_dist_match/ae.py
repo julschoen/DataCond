@@ -10,13 +10,13 @@ class Encoder(nn.Module):
 
         self.z_dim = z_dim
 
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1)
-        self.norm1 = nn.GroupNorm(16, 16, affine=True)
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1)
-        self.norm2 = nn.GroupNorm(32, 32, affine=True)
-        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
-        self.norm3 = nn.GroupNorm(64, 64, affine=True)
-        self.conv4 = nn.Conv2d(64, z_dim, kernel_size=3, stride=2, padding=0)
+        self.conv1 = nn.Conv2d(3, nfilter//4, kernel_size=3, stride=2, padding=1)
+        self.norm1 = nn.GroupNorm(nfilter//4, nfilter//4, affine=True)
+        self.conv2 = nn.Conv2d(nfilter//4, nfilter//2, kernel_size=3, stride=2, padding=1)
+        self.norm2 = nn.GroupNorm(nfilter//2, nfilter//2, affine=True)
+        self.conv3 = nn.Conv2d(nfilter//2, nfilter, kernel_size=3, stride=2, padding=1)
+        self.norm3 = nn.GroupNorm(nfilter, nfilter, affine=True)
+        self.conv4 = nn.Conv2d(nfilter, z_dim, kernel_size=3, stride=2, padding=0)
 
 
         self.fc1 = nn.Linear(10, z_dim)
@@ -45,14 +45,14 @@ class Decoder(nn.Module):
     def __init__(self, z_dim, nfilter=128):
         super(Decoder, self).__init__()
         self.z_dim = 2*z_dim
-        self.conv1 = nn.ConvTranspose2d(self.z_dim, 64, kernel_size=4, stride=2, padding=0)
-        self.conv2 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1)
-        self.conv3 = nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1)
-        self.conv4 = nn.ConvTranspose2d(16, 3, kernel_size=4, stride=2, padding=1)
+        self.conv1 = nn.ConvTranspose2d(self.z_dim, nfilter, kernel_size=4, stride=2, padding=0)
+        self.conv2 = nn.ConvTranspose2d(nfilter, nfilter//2, kernel_size=4, stride=2, padding=1)
+        self.conv3 = nn.ConvTranspose2d(nfilter//2, nfilter//4, kernel_size=4, stride=2, padding=1)
+        self.conv4 = nn.ConvTranspose2d(nfilter//4, 3, kernel_size=4, stride=2, padding=1)
 
-        self.norm1 = nn.GroupNorm(64, 64, affine=True)
-        self.norm2 = nn.GroupNorm(32, 32, affine=True)
-        self.norm3 = nn.GroupNorm(16, 16, affine=True)
+        self.norm1 = nn.GroupNorm(nfilter, nfilter, affine=True)
+        self.norm2 = nn.GroupNorm(nfilter//2, nfilter//2, affine=True)
+        self.norm3 = nn.GroupNorm(nfilter//4, nfilter//4, affine=True)
 
     # forward method
     def forward(self, input):
