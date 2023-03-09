@@ -54,21 +54,21 @@ def main():
     transformer = IncrementalPCA(n_components=2, batch_size=200)
     with torch.no_grad():
         for i, (x,y) in enumerate(train_loader):
-            _, z = trainer.ae(x.cuda(), y)
+            _, z = trainer.ae(x.to(args.device), y.to(args.device))
             transformer.partial_fit(z.squeeze().detach().cpu().numpy())
 
     zs = []
     ys = []
     with torch.no_grad():
         for i, (x,y) in enumerate(train_loader):
-            _, z = trainer.ae(x.cuda(), y)
+            _, z = trainer.ae(x.to(args.device), y.to(args.device))
 
             z = transformer.transform(z.squeeze().detach().cpu().numpy())
 
             zs.append(z)
             ys.append(y.detach().cpu())
 
-    _, z_ims = trainer.ae(torch.tanh(trainer.ims), trainer.labels)
+    _, z_ims = trainer.ae(torch.tanh(trainer.ims).to(args.device), trainer.labels.to(args.device))
 
     z_ims = transformer.transform(z_ims.squeeze().detach().cpu().numpy())
     zs.append(z_ims)
