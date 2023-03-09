@@ -152,10 +152,10 @@ class Trainer():
                     data = data.to(self.p.device)
                     self.vae.zero_grad()
                     if self.p.ae:
-                        pred, z = self.vae(data,label)
+                        pred, z = self.vae(data,label.to(self.p.device))
                         loss = self.loss_ae(data, pred)
                     else:
-                        pred, mu, logvar, z = self.vae(data, label)
+                        pred, mu, logvar, z = self.vae(data, label.to(self.p.device))
                         rec, kl = self.loss(data, pred, mu, logvar)
                         loss = rec + self.p.beta * kl
                 loss.backward()
@@ -242,7 +242,7 @@ class Trainer():
                 d_c = data[labels == c]
                 d_c = d_c[torch.randperm(d_c.shape[0])[:self.p.num_ims]]
 
-                labels = torch.ones(d_c.shape[0], dtype=torch.long)*c
+                labels = torch.ones(d_c.shape[0], dtype=torch.long, device=self.p.device)*c
                 ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
 
                 ## VAE
