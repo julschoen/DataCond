@@ -146,12 +146,13 @@ class Trainer():
         else:
             for p in self.vae.parameters():
                 p.requires_grad = True
-            with torch.autocast(device_type=self.p.device, dtype=torch.float16):
-                for t in range(self.p.niter_vae):
-                    
-                    data, label = next(self.gen)
-                    data = data.to(self.p.device)
-                    self.vae.zero_grad()
+            
+            for t in range(self.p.niter_vae):
+                
+                data, label = next(self.gen)
+                data = data.to(self.p.device)
+                self.vae.zero_grad()
+                with torch.autocast(device_type=self.p.device, dtype=torch.float16):
                     if self.p.ae:
                         pred, z = self.vae(data,label.to(self.p.device))
                         loss = self.loss_ae(data, pred)
@@ -159,14 +160,14 @@ class Trainer():
                         pred, mu, logvar, z = self.vae(data, label.to(self.p.device))
                         rec, kl = self.loss(data, pred, mu, logvar)
                         loss = rec + self.p.beta * kl
-                    loss.backward()
-                    self.opt_vae.step()
-                    if (t%100) == 0:
-                        if self.p.ae:
-                            print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_vae, loss.item()), flush=True)
-                        else:
-                            print('[{}|{}] Rec: {:.4f}, KLD: {:.4f}, Loss {:.4f}'.format(t, self.p.niter_vae, rec.item(), kl.item(), loss.item()),flush=True)
-                        self.log_reconstructions(t, data, pred)
+                loss.backward()
+                self.opt_vae.step()
+                if (t%100) == 0:
+                    if self.p.ae:
+                        print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_vae, loss.item()), flush=True)
+                    else:
+                        print('[{}|{}] Rec: {:.4f}, KLD: {:.4f}, Loss {:.4f}'.format(t, self.p.niter_vae, rec.item(), kl.item(), loss.item()),flush=True)
+                    self.log_reconstructions(t, data, pred)
             self.save_vae()
 
             for p in self.vae.parameters():
