@@ -202,44 +202,45 @@ class Trainer():
                 p.requires_grad = False
 
         self.ae.eval()
-        with torch.autocast(device_type=self.p.device, dtype=torch.float16):
-            for t in range(self.p.niter_ims):
-                loss = torch.tensor(0.0).to(self.p.device)
-                for c in range(10):
-                    data, labels = next(self.gen)
+        
+        for t in range(self.p.niter_ims):
+            loss = torch.tensor(0.0).to(self.p.device)
+            for c in range(10):
+                data, labels = next(self.gen)
 
-                    d_c = data[labels == c]
+                d_c = data[labels == c]
 
-                    labels = torch.ones(d_c.shape[0], dtype=torch.long, device=self.p.device)*c
-                    ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
-                    
-                    ## AE
+                labels = torch.ones(d_c.shape[0], dtype=torch.long, device=self.p.device)*c
+                ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
+                
+                ## AE
+                with torch.autocast(device_type=self.p.device, dtype=torch.float16):
                     encX = self.ae.encoder(d_c.to(self.p.device), labels).detach()
                     encY = self.ae.encoder(torch.tanh(ims), labels[:ims.shape[0]])
 
-                    mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
+                mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
 
-                    ## Correlation:
-                    if self.p.corr:
-                        corr = self.total_variation_loss(torch.tanh(ims))
-                    else:
-                        corr = torch.zeros(1)
+                ## Correlation:
+                if self.p.corr:
+                    corr = self.total_variation_loss(torch.tanh(ims))
+                else:
+                    corr = torch.zeros(1)
 
-                    loss = loss + mmd
+                loss = loss + mmd
 
-                    if self.p.corr:
-                        loss = loss + self.p.corr_coef*corr
+                if self.p.corr:
+                    loss = loss + self.p.corr_coef*corr
 
-                self.opt_ims.zero_grad()
-                loss.backward()
-                self.opt_ims.step()
-            
-                if (t%100) == 0:
-                    s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter_ims, loss.item(), mmd.item())
-                    if self.p.corr:
-                        s += ', Corr: {:.4f}'.format(corr.item())
-                    print(s,flush=True)
-                    self.log_interpolation(t)
+            self.opt_ims.zero_grad()
+            loss.backward()
+            self.opt_ims.step()
+        
+            if (t%100) == 0:
+                s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter_ims, loss.item(), mmd.item())
+                if self.p.corr:
+                    s += ', Corr: {:.4f}'.format(corr.item())
+                print(s,flush=True)
+                self.log_interpolation(t)
 
         self.save()
         self.ims.requires_grad = False
