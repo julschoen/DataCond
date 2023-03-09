@@ -41,7 +41,7 @@ class Decoder(nn.Module):
     def __init__(self, z_dim, nfilter=128):
         super(Decoder, self).__init__()
         z_dim = 2*z_dim
-        self.conv1 = nn.ConvTranspose2d(self.z_dim, nfilter, kernel_size=4, stride=2, padding=0)
+        self.conv1 = nn.ConvTranspose2d(z_dim, nfilter, kernel_size=4, stride=2, padding=0)
         self.conv2 = nn.ConvTranspose2d(nfilter, nfilter//2, kernel_size=4, stride=2, padding=1)
         self.conv3 = nn.ConvTranspose2d(nfilter//2, nfilter//4, kernel_size=4, stride=2, padding=1)
         self.conv4 = nn.ConvTranspose2d(nfilter//4, 3, kernel_size=4, stride=2, padding=1)
