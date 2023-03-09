@@ -97,7 +97,6 @@ class Encoder(nn.Module):
             self.conv_log_var = nn.Conv2d(16 * ch, latent_channels, 4, 1)
         self.act_fnc = nn.ELU()
 
-        self.fc1 = nn.Linear(10, latent_channels)
 
     def sample(self, mu, log_var):
         std = torch.exp(0.5*log_var)
@@ -114,10 +113,6 @@ class Encoder(nn.Module):
         x = self.res_down_block3(x)  # 4
         if self.ae:
             z = self.conv_latent(x).squeeze()
-            label = F.one_hot(y, num_classes=10).float()
-
-            y = self.fc1(label)
-            z = torch.cat((z, y), dim=1)
             return z
         else:
             mu = self.conv_mu(x)  # 1
@@ -129,7 +124,7 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, channels, ch=128, latent_channels=512):
         super(Decoder, self).__init__()
-        self.conv_t_up = nn.ConvTranspose2d(latent_channels*2, ch * 8, 4, 1)
+        self.conv_t_up = nn.ConvTranspose2d(latent_channels, ch * 8, 4, 1)
         self.res_up_block1 = ResUp(ch * 8, ch * 4)
         self.res_up_block2 = ResUp(ch * 4, ch * 2)
         self.res_up_block3 = ResUp(ch * 2, ch)
@@ -137,7 +132,6 @@ class Decoder(nn.Module):
         self.act_fnc = nn.ELU()
 
     def forward(self, x):
-        x = x.reshape(-1,x.shape[1], 1, 1)
         x = self.act_fnc(self.conv_t_up(x))  # 4
         x = self.res_up_block1(x)  # 8
         x = self.res_up_block2(x)  # 16
