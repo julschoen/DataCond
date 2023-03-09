@@ -27,7 +27,7 @@ def main():
     parser.add_argument('--num_ims', type=int, default=10)
     parser.add_argument('--niter_ims', type=int, default=10000)
     parser.add_argument('--init_ims', type=bool,default=False)
-    parser.add_argument('--lrIms', type=float, default=1e-3)
+    parser.add_argument('--lrIms', type=float, default=1e-2)
     parser.add_argument('--corr', type=bool, default=False)
     parser.add_argument('--corr_coef', type=float, default=0.1)
 
