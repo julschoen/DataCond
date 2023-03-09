@@ -303,61 +303,6 @@ class Trainer():
 
         self.save()
         self.ims.requires_grad = False
-
-    def train_ims(self):
-        print('############## Training Images ##############',flush=True)
-        self.ims.requires_grad = True
-        stats = []
-        self.vae.eval()
-
-        for p in self.vae.parameters():
-                p.requires_grad = False
-
-        for t in range(self.p.niter_ims):
-            loss = torch.tensor(0.0).to(self.p.device)
-            data, labels = next(self.gen)
-
-            perm = torch.randperm(data.shape[0])[:self.p.num_ims*10]
-            data = data[perm]
-            labels = labels[perm]
-
-            ## VAE
-            if self.p.ae:
-                _, encX = self.vae(data.to(self.p.device), labels)
-                rec, encY = self.vae(torch.tanh(self.ims), self.labels)
-            else:
-                _, _, _, encX = self.vae(data.to(self.p.device), labels)
-                rec, _, _, encY = self.vae(torch.tanh(self.ims), self.labels)
-
-            encX = encX.detach()
-            mmd = mix_rbf_mmd2(encX, encY, [8, 16, 32, 64])
-            mmd = torch.sqrt(F.relu(mmd))
-            loss = loss + mmd
-
-            if self.p.rec:
-                rec_loss = self.loss_ae(torch.tanh(self.ims), rec)
-                loss = loss + self.p.rec_coef*rec
-
-            ## Correlation:
-            if self.p.corr:
-                corr = self.total_variation_loss(torch.tanh(self.ims))
-                loss = loss + self.p.corr_coef*corr
-
-            self.opt_ims.zero_grad()
-            loss.backward()
-            self.opt_ims.step()
-        
-            if (t%100) == 0:
-                s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter_ims, loss.item(), mmd.item())
-                if self.p.corr:
-                    s += ', Corr: {:.4f}'.format(corr.item())
-                if self.p.rec:
-                    s += ', Rec: {:.4f}'.format(rec.item())
-                print(s,flush=True)
-                self.log_interpolation(t)
-
-        self.save()
-        self.ims.requires_grad = False
                 
     def train_up(self):
         print('############## Training Images ##############',flush=True)
@@ -441,7 +386,4 @@ class Trainer():
         if self.p.up:
             self.train_up()
         else:
-            if self.p.class_wise:
-                self.train_ims_cw()
-            else:
-                self.train_ims()
+            self.train_ims_cw()
