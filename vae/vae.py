@@ -129,14 +129,16 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, channels, ch=128, latent_channels=512):
         super(Decoder, self).__init__()
-        self.conv_t_up = nn.ConvTranspose2d(latent_channels, ch * 8, 4, 1)
+        self.conv_t_up = nn.ConvTranspose2d(latent_channels*2, ch * 8, 4, 1)
         self.res_up_block1 = ResUp(ch * 8, ch * 4)
         self.res_up_block2 = ResUp(ch * 4, ch * 2)
         self.res_up_block3 = ResUp(ch * 2, ch)
         self.conv_out = nn.Conv2d(ch, channels, 3, 1, 1)
         self.act_fnc = nn.ELU()
+        self.z_dim = latent_channels
 
     def forward(self, x):
+        x = x.reshape(-1,self.z_dim, 1, 1)
         x = self.act_fnc(self.conv_t_up(x))  # 4
         x = self.res_up_block1(x)  # 8
         x = self.res_up_block2(x)  # 16
