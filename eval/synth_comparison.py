@@ -103,9 +103,9 @@ def main():
     conv = np.array(conv)
     res = np.array(res)
     simple = np.array(simple)
-    print('Conv {.2f}\\pm{.2f}'.format(conv.mean(), conv.std()))
-    print('Res {.2f}\\pm{.2f}'.format(res.mean(), res.std()))
-    print('Simple {.2f}\\pm{.2f}'.format(simple.mean(), simple.std()))
+    print('Conv {:.2f}\\pm{:.2f}'.format(conv.mean(), conv.std()))
+    print('Res {:.2f}\\pm{:.2f}'.format(res.mean(), res.std()))
+    print('Simple {:.2f}\\pm{:.2f}'.format(simple.mean(), simple.std()))
 
 
 
