@@ -29,7 +29,7 @@ class Trainer():
 
         self.models = []
         for _ in range(self.p.num_models):
-            m = ConvNet(cl=False)
+            m = ConvNet(params, cl=False)
             self.models.append(m)
         
         ### Make Log Dirs
