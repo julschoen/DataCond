@@ -54,11 +54,7 @@ def main():
     transformer = IncrementalPCA(n_components=2, batch_size=200)
     with torch.no_grad():
         for i, (x,y) in enumerate(train_loader):
-            if args.ae:
-                _, z = trainer.vae(x.cuda(), y)
-            else:
-                _, _, _, z = trainer.vae(x.cuda(), y)
-
+            _, z = trainer.ae(x.cuda(), y)
             transformer.partial_fit(z.squeeze().detach().cpu().numpy())
 
     zs = []
