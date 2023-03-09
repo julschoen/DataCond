@@ -52,7 +52,7 @@ class Decoder(nn.Module):
 
     # forward method
     def forward(self, input):
-        input = input.reshape(-1,input.shape[0], 1, 1)
+        input = input.reshape(-1,input.shape[1], 1, 1)
         x = self.norm1(self.conv1(input))
         x = F.relu(x)
 
