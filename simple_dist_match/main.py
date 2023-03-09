@@ -51,64 +51,63 @@ def main():
     trainer = Trainer(args, train_loader)
     trainer.train()
 
-    if args.pca:
-        transformer = IncrementalPCA(n_components=2, batch_size=200)
-        with torch.no_grad():
-            for i, (x,y) in enumerate(train_loader):
-                if args.ae:
-                    _, z = trainer.vae(x.cuda(), y)
-                else:
-                    _, _, _, z = trainer.vae(x.cuda(), y)
+    transformer = IncrementalPCA(n_components=2, batch_size=200)
+    with torch.no_grad():
+        for i, (x,y) in enumerate(train_loader):
+            if args.ae:
+                _, z = trainer.vae(x.cuda(), y)
+            else:
+                _, _, _, z = trainer.vae(x.cuda(), y)
 
-                transformer.partial_fit(z.squeeze().detach().cpu().numpy())
+            transformer.partial_fit(z.squeeze().detach().cpu().numpy())
 
-        zs = []
-        ys = []
-        with torch.no_grad():
-            for i, (x,y) in enumerate(train_loader):
-                if args.ae:
-                    _, z = trainer.vae(x.cuda(), y)
-                else:
-                    _, _, _, z = trainer.vae(x.cuda(), y)
+    zs = []
+    ys = []
+    with torch.no_grad():
+        for i, (x,y) in enumerate(train_loader):
+            if args.ae:
+                _, z = trainer.vae(x.cuda(), y)
+            else:
+                _, _, _, z = trainer.vae(x.cuda(), y)
 
-                z = transformer.transform(z.squeeze().detach().cpu().numpy())
+            z = transformer.transform(z.squeeze().detach().cpu().numpy())
 
-                zs.append(z)
-                ys.append(y.detach().cpu())
+            zs.append(z)
+            ys.append(y.detach().cpu())
 
-        if args.ae:
-            _, z_ims = trainer.vae(torch.tanh(trainer.ims), trainer.labels)
-        else:
-            _, _, _, z_ims = trainer.vae(torch.tanh(trainer.ims), trainer.labels)
+    if args.ae:
+        _, z_ims = trainer.vae(torch.tanh(trainer.ims), trainer.labels)
+    else:
+        _, _, _, z_ims = trainer.vae(torch.tanh(trainer.ims), trainer.labels)
 
-        z_ims = transformer.transform(z_ims.squeeze().detach().cpu().numpy())
-        zs.append(z_ims)
-        ys.append(trainer.labels.detach().cpu())
+    z_ims = transformer.transform(z_ims.squeeze().detach().cpu().numpy())
+    zs.append(z_ims)
+    ys.append(trainer.labels.detach().cpu())
 
-        zs = np.concatenate(zs)
-        ys = np.concatenate(ys)
+    zs = np.concatenate(zs)
+    ys = np.concatenate(ys)
 
-        print(transformer.explained_variance_ratio_)
+    print(transformer.explained_variance_ratio_)
 
-        X, Y = zs[:-100], ys[:-100]
-        x, y = zs[-100:], ys[-100:]
+    X, Y = zs[:-100], ys[:-100]
+    x, y = zs[-100:], ys[-100:]
 
-        fig = plt.figure(figsize=(16,14))
-        plt.scatter(X[:,0], X[:,1], c=Y, cmap='Set1')
-        plt.scatter(x[:,0], x[:,1], cmap='black')
-        plt.colorbar()
-        plt.savefig(os.path.join(args.log_dir, 'images','all_vae.pdf'), bbox_inches='tight')
-        plt.close(fig)
+    fig = plt.figure(figsize=(16,14))
+    plt.scatter(X[:,0], X[:,1], c=Y, cmap='Set1')
+    plt.scatter(x[:,0], x[:,1], cmap='black')
+    plt.colorbar()
+    plt.savefig(os.path.join(args.log_dir, 'images','all_vae.pdf'), bbox_inches='tight')
+    plt.close(fig)
 
-        fig = plt.figure(figsize=(40,30))
-        for ind in range(10):
-            plt.subplot(3,4,ind+1)
-            plt.scatter(X[ind == Y,0], X[ind == Y,1], cmap='b', label='real')
-            plt.scatter(x[ind == y,0], x[ind == y,1], cmap='r', label='embedded')
-            plt.title(f'Class {ind}')
-            plt.legend()
-        plt.savefig(os.path.join(args.log_dir, 'images','classes_vae.pdf'), bbox_inches='tight')
-        plt.close(fig)
+    fig = plt.figure(figsize=(40,30))
+    for ind in range(10):
+        plt.subplot(3,4,ind+1)
+        plt.scatter(X[ind == Y,0], X[ind == Y,1], cmap='b', label='real')
+        plt.scatter(x[ind == y,0], x[ind == y,1], cmap='r', label='embedded')
+        plt.title(f'Class {ind}')
+        plt.legend()
+    plt.savefig(os.path.join(args.log_dir, 'images','classes_vae.pdf'), bbox_inches='tight')
+    plt.close(fig)
     
 
 if __name__ == '__main__':
