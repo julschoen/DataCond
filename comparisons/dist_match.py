@@ -29,8 +29,8 @@ class Trainer():
 
         self.models = []
         for _ in range(self.p.num_models):
-        	m = ConvNet(cl=False)
-            self.moedels.append(m)
+            m = ConvNet(cl=False)
+            self.models.append(m)
         
         ### Make Log Dirs
         if not os.path.isdir(self.p.log_dir):
