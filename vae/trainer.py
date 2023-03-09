@@ -146,8 +146,9 @@ class Trainer():
         else:
             for p in self.vae.parameters():
                 p.requires_grad = True
-            for t in range(self.p.niter_vae):
-                with torch.autocast(device_type=self.p.device, dtype=torch.float16):
+            with torch.autocast(device_type=self.p.device, dtype=torch.float16):
+                for t in range(self.p.niter_vae):
+                    
                     data, label = next(self.gen)
                     data = data.to(self.p.device)
                     self.vae.zero_grad()
@@ -158,14 +159,14 @@ class Trainer():
                         pred, mu, logvar, z = self.vae(data, label.to(self.p.device))
                         rec, kl = self.loss(data, pred, mu, logvar)
                         loss = rec + self.p.beta * kl
-                loss.backward()
-                self.opt_vae.step()
-                if (t%100) == 0:
-                    if self.p.ae:
-                        print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_vae, loss.item()), flush=True)
-                    else:
-                        print('[{}|{}] Rec: {:.4f}, KLD: {:.4f}, Loss {:.4f}'.format(t, self.p.niter_vae, rec.item(), kl.item(), loss.item()),flush=True)
-                    self.log_reconstructions(t, data, pred)
+                    loss.backward()
+                    self.opt_vae.step()
+                    if (t%100) == 0:
+                        if self.p.ae:
+                            print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_vae, loss.item()), flush=True)
+                        else:
+                            print('[{}|{}] Rec: {:.4f}, KLD: {:.4f}, Loss {:.4f}'.format(t, self.p.niter_vae, rec.item(), kl.item(), loss.item()),flush=True)
+                        self.log_reconstructions(t, data, pred)
             self.save_vae()
 
             for p in self.vae.parameters():
@@ -232,66 +233,66 @@ class Trainer():
 
         for p in self.vae.parameters():
                 p.requires_grad = False
+        with torch.autocast(device_type=self.p.device, dtype=torch.float16):
+            for t in range(self.p.niter_ims):
+                loss = torch.tensor(0.0).to(self.p.device)
 
-        for t in range(self.p.niter_ims):
-            loss = torch.tensor(0.0).to(self.p.device)
+                for c in range(10):
+                    data, labels = next(self.gen)
 
-            for c in range(10):
-                data, labels = next(self.gen)
+                    d_c = data[labels == c]
+                    d_c = d_c[torch.randperm(d_c.shape[0])[:self.p.num_ims]]
 
-                d_c = data[labels == c]
-                d_c = d_c[torch.randperm(d_c.shape[0])[:self.p.num_ims]]
+                    labels = torch.ones(d_c.shape[0], dtype=torch.long, device=self.p.device)*c
+                    ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
 
-                labels = torch.ones(d_c.shape[0], dtype=torch.long, device=self.p.device)*c
-                ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
+                    ## VAE
+                    if self.p.ae:
+                        encX = self.vae.encoder(d_c.to(self.p.device), labels).detach()
+                        encY = self.vae.encoder(torch.tanh(ims), labels[:ims.shape[0]])
+                        mmd = mix_rbf_mmd2(encX, encY, [8, 16, 32, 64])
+                        mmd = torch.sqrt(F.relu(mmd))
+                        #mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
+                    else:
+                        _, muX, varX, encX = self.vae(d_c.to(self.p.device), labels)
+                        encX = encX.detach()
+                        muX, varX = muX.detach(), varX.detach()
+                        rec, mu, logvar, encY = self.vae(torch.tanh(ims), labels)
+                        mmdMu = mix_rbf_mmd2(muX, mu, [8, 16, 32, 64])
+                        mmdMu = torch.sqrt(F.relu(mmdMu))
+                        mmdVar = mix_rbf_mmd2(varX, logvar, [8, 16, 32, 64])
+                        mmdVar = torch.sqrt(F.relu(mmdVar))
+                        mmd = mmdMu + mmdVar
 
-                ## VAE
-                if self.p.ae:
-                    encX = self.vae.encoder(d_c.to(self.p.device), labels).detach()
-                    encY = self.vae.encoder(torch.tanh(ims), labels[:ims.shape[0]])
-                    mmd = mix_rbf_mmd2(encX, encY, [8, 16, 32, 64])
-                    mmd = torch.sqrt(F.relu(mmd))
-                    #mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
-                else:
-                    _, muX, varX, encX = self.vae(d_c.to(self.p.device), labels)
-                    encX = encX.detach()
-                    muX, varX = muX.detach(), varX.detach()
-                    rec, mu, logvar, encY = self.vae(torch.tanh(ims), labels)
-                    mmdMu = mix_rbf_mmd2(muX, mu, [8, 16, 32, 64])
-                    mmdMu = torch.sqrt(F.relu(mmdMu))
-                    mmdVar = mix_rbf_mmd2(varX, logvar, [8, 16, 32, 64])
-                    mmdVar = torch.sqrt(F.relu(mmdVar))
-                    mmd = mmdMu + mmdVar
+                    if self.p.rec:
+                        rec_loss, _ = self.loss(torch.tanh(ims), rec, mu, logvar)
 
-                if self.p.rec:
-                    rec_loss, _ = self.loss(torch.tanh(ims), rec, mu, logvar)
+                    ## Correlation:
+                    if self.p.corr:
+                        corr = self.total_variation_loss(torch.tanh(ims))
+                    else:
+                        corr = torch.zeros(1)
 
-                ## Correlation:
-                if self.p.corr:
-                    corr = self.total_variation_loss(torch.tanh(ims))
-                else:
-                    corr = torch.zeros(1)
+                    loss = loss + mmd
 
-                loss = loss + mmd
+                    if self.p.corr:
+                        loss = loss + self.p.corr_coef*corr
 
-                if self.p.corr:
-                    loss = loss + self.p.corr_coef*corr
+                    if self.p.rec:
+                        loss = loss + self.p.rec_coef*rec
 
-                if self.p.rec:
-                    loss = loss + self.p.rec_coef*rec
-
-            self.opt_ims.zero_grad()
-            loss.backward()
-            self.opt_ims.step()
-        
-            if (t%100) == 0:
-                s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter_ims, loss.item(), mmd.item())
-                if self.p.corr:
-                    s += ', Corr: {:.4f}'.format(corr.item())
-                if self.p.rec:
-                    s += ', Rec: {:.4f}'.format(rec.item())
-                print(s,flush=True)
-                self.log_interpolation(t)
+                self.opt_ims.zero_grad()
+                loss.backward()
+                self.opt_ims.step()
+            
+                if (t%100) == 0:
+                    s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter_ims, loss.item(), mmd.item())
+                    if self.p.corr:
+                        s += ', Corr: {:.4f}'.format(corr.item())
+                    if self.p.rec:
+                        s += ', Rec: {:.4f}'.format(rec.item())
+                    print(s,flush=True)
+                    self.log_interpolation(t)
 
         self.save()
         self.ims.requires_grad = False
