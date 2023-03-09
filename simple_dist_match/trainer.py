@@ -29,6 +29,8 @@ class Trainer():
         self.labels = torch.arange(10, device=self.p.device).repeat(self.p.num_ims,1).T.flatten()
         self.opt_ims = torch.optim.Adam([self.ims], lr=self.p.lrIms)
 
+        self.scaler = torch.cuda.amp.GradScaler()
+
 
         
         ### Make Log Dirs
@@ -130,8 +132,10 @@ class Trainer():
                     pred, z = self.ae(data,label.to(self.p.device))
                     loss = self.loss(data, pred)
 
-                loss.backward()
-                self.opt_ae.step()
+                self.scaler.scale(loss).backward()
+                self.scaler.step(self.opt_ae)
+                self.scaler.update()
+
                 if (t%100) == 0:
                     print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_ae, loss.item()), flush=True)
                     self.log_reconstructions(t, data, pred)
@@ -218,22 +222,23 @@ class Trainer():
                     encX = self.ae.encoder(d_c.to(self.p.device), labels).detach()
                     encY = self.ae.encoder(torch.tanh(ims), labels[:ims.shape[0]])
 
-                mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
+                    mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
 
-                ## Correlation:
-                if self.p.corr:
-                    corr = self.total_variation_loss(torch.tanh(ims))
-                else:
-                    corr = torch.zeros(1)
+                    ## Correlation:
+                    if self.p.corr:
+                        corr = self.total_variation_loss(torch.tanh(ims))
+                    else:
+                        corr = torch.zeros(1)
 
-                loss = loss + mmd
+                    loss = loss + mmd
 
-                if self.p.corr:
-                    loss = loss + self.p.corr_coef*corr
+                    if self.p.corr:
+                        loss = loss + self.p.corr_coef*corr
 
             self.opt_ims.zero_grad()
-            loss.backward()
-            self.opt_ims.step()
+            self.scaler.scale(loss).backward()
+            self.scaler.step(self.opt_ims)
+            self.scaler.update()
         
             if (t%100) == 0:
                 s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter_ims, loss.item(), mmd.item())

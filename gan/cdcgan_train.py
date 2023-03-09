@@ -64,6 +64,8 @@ class Trainer():
             os.mkdir('./cdc_carbon')
         #self.tracker = CarbonTracker(epochs=self.p.niter, log_dir='./cdc_carbon/')
 
+        self.scaler = torch.cuda.amp.GradScaler()
+
     def inf_train_gen(self):
         while True:
             for data in self.train_loader:
@@ -216,9 +218,10 @@ class Trainer():
                         else:
                             mmd2_D = F.relu(mmd2_D)
                             errD = -torch.sqrt(mmd2_D)
-                errD.backward()
-                self.optD.step()
 
+                self.scaler.scale(errD).backward()
+                self.scaler.step(self.optD)
+                self.scaler.update()
 
             for p in self.model.parameters():
                 p.requires_grad = False
@@ -269,9 +272,10 @@ class Trainer():
                     if self.p.corr:
                         corr = self.total_variation_loss(torch.tanh(self.ims))
                         errG = errG + corr * self.p.corr_coef
-                
-                errG.backward()
-                self.optIms.step()
+
+                self.scaler.scale(errG).backward()
+                self.scaler.step(self.optIms)
+                self.scaler.update()
             self.ims.requires_grad = False
 
             #self.tracker.epoch_end()

@@ -41,6 +41,8 @@ class Trainer():
             self.labels = torch.arange(10, device=self.p.device).repeat(self.p.num_ims,1).T.flatten()
             self.opt_ims = torch.optim.Adam([self.ims], lr=self.p.lrIms)
 
+        self.scaler = torch.cuda.amp.GradScaler()
+
 
         
         ### Make Log Dirs
@@ -160,8 +162,11 @@ class Trainer():
                         pred, mu, logvar, z = self.vae(data, label.to(self.p.device))
                         rec, kl = self.loss(data, pred, mu, logvar)
                         loss = rec + self.p.beta * kl
-                loss.backward()
-                self.opt_vae.step()
+
+                self.scaler.scale(loss).backward()
+                self.scaler.step(self.opt_vae)
+                self.scaler.update()
+
                 if (t%100) == 0:
                     if self.p.ae:
                         print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_vae, loss.item()), flush=True)
@@ -246,45 +251,46 @@ class Trainer():
 
                     labels = torch.ones(d_c.shape[0], dtype=torch.long, device=self.p.device)*c
                     ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
+                    with torch.autocast(device_type=self.p.device, dtype=torch.float16):
+                        ## VAE
+                        if self.p.ae:
+                            encX = self.vae.encoder(d_c.to(self.p.device), labels).detach()
+                            encY = self.vae.encoder(torch.tanh(ims), labels[:ims.shape[0]])
+                            mmd = mix_rbf_mmd2(encX, encY, [8, 16, 32, 64])
+                            mmd = torch.sqrt(F.relu(mmd))
+                            #mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
+                        else:
+                            _, muX, varX, encX = self.vae(d_c.to(self.p.device), labels)
+                            encX = encX.detach()
+                            muX, varX = muX.detach(), varX.detach()
+                            rec, mu, logvar, encY = self.vae(torch.tanh(ims), labels)
+                            mmdMu = mix_rbf_mmd2(muX, mu, [8, 16, 32, 64])
+                            mmdMu = torch.sqrt(F.relu(mmdMu))
+                            mmdVar = mix_rbf_mmd2(varX, logvar, [8, 16, 32, 64])
+                            mmdVar = torch.sqrt(F.relu(mmdVar))
+                            mmd = mmdMu + mmdVar
 
-                    ## VAE
-                    if self.p.ae:
-                        encX = self.vae.encoder(d_c.to(self.p.device), labels).detach()
-                        encY = self.vae.encoder(torch.tanh(ims), labels[:ims.shape[0]])
-                        mmd = mix_rbf_mmd2(encX, encY, [8, 16, 32, 64])
-                        mmd = torch.sqrt(F.relu(mmd))
-                        #mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
-                    else:
-                        _, muX, varX, encX = self.vae(d_c.to(self.p.device), labels)
-                        encX = encX.detach()
-                        muX, varX = muX.detach(), varX.detach()
-                        rec, mu, logvar, encY = self.vae(torch.tanh(ims), labels)
-                        mmdMu = mix_rbf_mmd2(muX, mu, [8, 16, 32, 64])
-                        mmdMu = torch.sqrt(F.relu(mmdMu))
-                        mmdVar = mix_rbf_mmd2(varX, logvar, [8, 16, 32, 64])
-                        mmdVar = torch.sqrt(F.relu(mmdVar))
-                        mmd = mmdMu + mmdVar
+                        if self.p.rec:
+                            rec_loss, _ = self.loss(torch.tanh(ims), rec, mu, logvar)
 
-                    if self.p.rec:
-                        rec_loss, _ = self.loss(torch.tanh(ims), rec, mu, logvar)
+                        ## Correlation:
+                        if self.p.corr:
+                            corr = self.total_variation_loss(torch.tanh(ims))
+                        else:
+                            corr = torch.zeros(1)
 
-                    ## Correlation:
-                    if self.p.corr:
-                        corr = self.total_variation_loss(torch.tanh(ims))
-                    else:
-                        corr = torch.zeros(1)
+                        loss = loss + mmd
 
-                    loss = loss + mmd
+                        if self.p.corr:
+                            loss = loss + self.p.corr_coef*corr
 
-                    if self.p.corr:
-                        loss = loss + self.p.corr_coef*corr
-
-                    if self.p.rec:
-                        loss = loss + self.p.rec_coef*rec
+                        if self.p.rec:
+                            loss = loss + self.p.rec_coef*rec
 
                 self.opt_ims.zero_grad()
-                loss.backward()
-                self.opt_ims.step()
+                self.scaler.scale(loss).backward()
+                self.scaler.step(self.opt_ims)
+                self.scaler.update()
             
                 if (t%100) == 0:
                     s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter_ims, loss.item(), mmd.item())
