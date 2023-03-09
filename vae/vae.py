@@ -87,7 +87,6 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.ae = ae
         self.conv_in = nn.Conv2d(channels, ch, 7, 1, 3)
-        self.conv_label = nn.Conv2d(10, ch, 7, 1, 3)
         self.res_down_block1 = ResDown(ch*2, 4 * ch)
         self.res_down_block2 = ResDown(4 * ch, 8 * ch)
         self.res_down_block3 = ResDown(8 * ch, 16 * ch)
@@ -98,9 +97,7 @@ class Encoder(nn.Module):
             self.conv_log_var = nn.Conv2d(16 * ch, latent_channels, 4, 1)
         self.act_fnc = nn.ELU()
 
-        self.fill = torch.zeros([10, 10, 32, 32]).to('cuda')
-        for i in range(10):
-            self.fill[i, i, :, :] = 1
+        self.fc1 = nn.Linear(10, latent_channels)
 
     def sample(self, mu, log_var):
         std = torch.exp(0.5*log_var)
@@ -116,7 +113,11 @@ class Encoder(nn.Module):
         x = self.res_down_block2(x)  # 8
         x = self.res_down_block3(x)  # 4
         if self.ae:
-            z = self.conv_latent(x)
+            z = self.conv_latent(x).squeeze()
+            label = F.one_hot(y, num_classes=10).float()
+
+            y = self.fc1(label)
+            z = torch.cat((z, y), dim=1)
             return z
         else:
             mu = self.conv_mu(x)  # 1
