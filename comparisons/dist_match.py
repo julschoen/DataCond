@@ -25,7 +25,7 @@ class Trainer():
 
         self.ims = torch.nn.Parameter(self.ims)
         self.labels = torch.arange(10, device=self.p.device).repeat(self.p.num_ims,1).T.flatten()
-        self.opt_ims = torch.optim.Adam([self.ims], lr=self.p.lr)
+        self.opt_ims = torch.optim.SGD([self.ims], lr=self.p.lr, momentum=0.5)
 
         self.models = []
         for _ in range(self.p.num_models):
@@ -160,9 +160,9 @@ def main():
     # Training settings
     parser = argparse.ArgumentParser(description='Simple Dist Match')
     # General Training
-    parser.add_argument('--batch-size', type=int, default= 256)
+    parser.add_argument('--batch-size', type=int, default= 512)
     parser.add_argument('--niter', type=int, default=20000)
-    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--lr', type=float, default=1)
     parser.add_argument('--num_ims', type=int, default=10)
     parser.add_argument('--num_models', type=int, default=20)
     parser.add_argument('--device', type=str, default='cuda')
