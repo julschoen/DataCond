@@ -65,20 +65,14 @@ def main():
     ys = []
     with torch.no_grad():
         for i, (x,y) in enumerate(train_loader):
-            if args.ae:
-                _, z = trainer.vae(x.cuda(), y)
-            else:
-                _, _, _, z = trainer.vae(x.cuda(), y)
+            _, z = trainer.ae(x.cuda(), y)
 
             z = transformer.transform(z.squeeze().detach().cpu().numpy())
 
             zs.append(z)
             ys.append(y.detach().cpu())
 
-    if args.ae:
-        _, z_ims = trainer.vae(torch.tanh(trainer.ims), trainer.labels)
-    else:
-        _, _, _, z_ims = trainer.vae(torch.tanh(trainer.ims), trainer.labels)
+    _, z_ims = trainer.ae(torch.tanh(trainer.ims), trainer.labels)
 
     z_ims = transformer.transform(z_ims.squeeze().detach().cpu().numpy())
     zs.append(z_ims)
