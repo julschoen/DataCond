@@ -77,7 +77,9 @@ def main():
                        transform=transform)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
+    conv = []
     res = []
+    simple = []
     for i in range(10):
         comp_dir = '../../comparison_synth'
         
