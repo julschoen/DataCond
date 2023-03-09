@@ -121,20 +121,20 @@ class Trainer():
         else:
             for p in self.ae.parameters():
                 p.requires_grad = True
-            with torch.autocast(device_type=self.p.device, dtype=torch.float16):
-                for t in range(self.p.niter_ae):
-                    
-                    data, label = next(self.gen)
-                    data = data.to(self.p.device)
-                    self.ae.zero_grad()       
+            for t in range(self.p.niter_ae):
+                
+                data, label = next(self.gen)
+                data = data.to(self.p.device)
+                self.ae.zero_grad()
+                with torch.autocast(device_type=self.p.device, dtype=torch.float16):
                     pred, z = self.ae(data,label.to(self.p.device))
                     loss = self.loss(data, pred)
 
-                    loss.backward()
-                    self.opt_ae.step()
-                    if (t%100) == 0:
-                        print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_ae, loss.item()), flush=True)
-                        self.log_reconstructions(t, data, pred)
+                loss.backward()
+                self.opt_ae.step()
+                if (t%100) == 0:
+                    print('[{}|{}] Loss: {:.4f}'.format(t, self.p.niter_ae, loss.item()), flush=True)
+                    self.log_reconstructions(t, data, pred)
             self.save_ae()
 
             for p in self.ae.parameters():
