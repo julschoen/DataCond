@@ -44,6 +44,8 @@ class Trainer():
         if not os.path.isdir(path):
             os.mkdir(path)
 
+        self.scaler = torch.cuda.amp.GradScaler()
+
     def inf_train_gen(self):
         while True:
             for data in self.train_loader:
@@ -118,24 +120,26 @@ class Trainer():
                 ims = self.ims[c*self.p.num_ims:(c+1)*self.p.num_ims]
                 model = self.sample_model()
 
-                encX = model(d_c).detach()
-                encY = model(ims)
+                with torch.autocast(device_type=self.p.device, dtype=torch.float16):
+                    encX = model(d_c).detach()
+                    encY = model(ims)
 
-                mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
+                    mmd = torch.norm(encX.mean(dim=0)-encY.mean(dim=0))
 
-                if self.p.corr:
-                    corr = self.total_variation_loss(torch.tanh(ims))
-                else:
-                    corr = torch.zeros(1)
+                    if self.p.corr:
+                        corr = self.total_variation_loss(torch.tanh(ims))
+                    else:
+                        corr = torch.zeros(1)
 
-                loss = loss + mmd
+                    loss = loss + mmd
 
-                if self.p.corr:
-                    loss = loss + self.p.corr_coef*corr
+                    if self.p.corr:
+                        loss = loss + self.p.corr_coef*corr
 
             self.opt_ims.zero_grad()
-            loss.backward()
-            self.opt_ims.step()
+            self.scaler.scale(loss).backward()
+            self.scaler.step(self.opt_ims)
+            self.scaler.update()
         
             if (t%100) == 0:
                 s = '[{}|{}] Loss: {:.4f}, MMD: {:.4f}'.format(t, self.p.niter, loss.item(), mmd.item())
