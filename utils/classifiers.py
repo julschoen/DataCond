@@ -14,7 +14,6 @@ class SimpleNet(nn.Module):
         x = F.relu(x)
         x = self.dropout(x)
         x = self.fc2(x)
-        x = F.log_softmax(x, dim=1)
         return x
 
 class ConvNet(nn.Module):
@@ -36,7 +35,6 @@ class ConvNet(nn.Module):
         out = out.view(out.size(0), -1)
         if self.cl:
             out = self.classifier(out)
-            out = F.log_softmax(out, dim=1)
         return out
 
     def _get_activation(self, net_act):
@@ -154,5 +152,4 @@ class ResNet18(nn.Module):
         out = self.avgpool(out)
         out = out.view(out.size(0), -1)
         out = self.linear(out)
-        out = F.log_softmax(out, dim=1)
         return out
