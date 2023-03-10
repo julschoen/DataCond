@@ -2,6 +2,9 @@ import argparse
 import torch
 from torchvision import datasets, transforms
 from cdcgan_train import Trainer
+import sys;
+sys.path.append("../") 
+from dataset import get_train_loader
 
 def main():
     # Training settings
@@ -34,21 +37,8 @@ def main():
     parser.add_argument('--filter', type=int, default=512)
     args = parser.parse_args()
 
-    train_kwargs = {'batch_size': args.batch_size, 'shuffle':True}
 
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            (0.5, 0.5, 0.5), 
-            (0.5, 0.5, 0.5))
-        ])
-    if args.cifar:
-        dataset1 = datasets.CIFAR10('../../data/', train=True, download=True,
-                           transform=transform)
-    else:
-        dataset1 = datasets.MNIST('../../data/', train=True, download=True,
-                           transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
+    train_loader = get_train_loader(args.batch_size)
 
     trainer = Trainer(args, train_loader)
     trainer.train()
