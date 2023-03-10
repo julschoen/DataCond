@@ -46,9 +46,10 @@ def main():
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
             es = EarlyStopper()
             for epoch in range(1, 200):
-                train(args, model, device, train_loader, optimizer, epoch)
-                val = val(model, device, val_loader)
-                if es.early_stop(val):
+                tl = train(args, model, device, train_loader, optimizer, epoch)
+                vl = val(model, device, val_loader)
+                es(tl, vl)
+                if es.early_stop:
                     break
             acc = test(model, device, test_loader)
             conv.append(acc)
@@ -57,9 +58,10 @@ def main():
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
             es = EarlyStopper()
             for epoch in range(1, 200):
-                train(args, model, device, train_loader, optimizer, epoch)
-                val = val(model, device, val_loader)
-                if es.early_stop(val):
+                tl = train(args, model, device, train_loader, optimizer, epoch)
+                vl = val(model, device, val_loader)
+                es(tl, vl)
+                if es.early_stop:
                     break
             acc = test(model, device, test_loader)
             res.append(acc)
@@ -68,9 +70,10 @@ def main():
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
             es = EarlyStopper()
             for epoch in range(1, 200):
-                train(args, model, device, train_loader, optimizer, epoch)
-                val = val(model, device, val_loader)
-                if es.early_stop(val):
+                tl = train(args, model, device, train_loader, optimizer, epoch)
+                vl = val(model, device, val_loader)
+                es(tl, vl)
+                if es.early_stop:
                     break
             acc = test(model, device, test_loader)
             simple.append(acc)

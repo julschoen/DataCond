@@ -39,9 +39,10 @@ def main():
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         es = EarlyStopper()
         for epoch in range(1, args.epochs + 1):
-            train(args, model, device, train_loader, optimizer, epoch)
-            val = val(model, device, val_loader)
-            if es.early_stop(val):
+            tl = train(args, model, device, train_loader, optimizer, epoch)
+            vl = val(model, device, val_loader)
+            es(tl, vl)
+            if es.early_stop:
                 break
         test(model, device, test_loader)
 
@@ -49,9 +50,10 @@ def main():
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         es = EarlyStopper()
         for epoch in range(1, args.epochs + 1):
-            train(args, model, device, train_loader, optimizer, epoch)
-            val = val(model, device, val_loader)
-            if es.early_stop(val):
+            tl = train(args, model, device, train_loader, optimizer, epoch)
+            vl = val(model, device, val_loader)
+            es(tl, vl)
+            if es.early_stop:
                 break
         test(model, device, test_loader)
 
@@ -59,9 +61,10 @@ def main():
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         es = EarlyStopper()
         for epoch in range(1, args.epochs + 1):
-            train(args, model, device, train_loader, optimizer, epoch)
-            val = val(model, device, val_loader)
-            if es.early_stop(val):
+            tl = train(args, model, device, train_loader, optimizer, epoch)
+            vl = val(model, device, val_loader)
+            es(tl, vl)
+            if es.early_stop:
                 break
         test(model, device, test_loader)
 
@@ -75,30 +78,33 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     es = EarlyStopper()
     for epoch in range(1, 200):
-        train(args, model, device, train_loader, optimizer, epoch)
-        val = val(model, device, val_loader)
-            if es.early_stop(val):
-                break
+        tl = train(args, model, device, train_loader, optimizer, epoch)
+        vl = val(model, device, val_loader)
+        es(tl, vl)
+        if es.early_stop:
+            break
     test(model, device, test_loader)
 
     model = ResNet18().to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     es = EarlyStopper()
     for epoch in range(1, 200):
-        train(args, model, device, train_loader, optimizer, epoch)
-        val = val(model, device, val_loader)
-            if es.early_stop(val):
-                break
+        tl = train(args, model, device, train_loader, optimizer, epoch)
+        vl = val(model, device, val_loader)
+        es(tl, vl)
+        if es.early_stop:
+            break
     test(model, device, test_loader)
 
     model = SimpleNet(in_dim=32*32*3).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     es = EarlyStopper()
     for epoch in range(1, 200):
-        train(args, model, device, train_loader, optimizer, epoch)
-        val = val(model, device, val_loader)
-            if es.early_stop(val):
-                break
+        tl = train(args, model, device, train_loader, optimizer, epoch)
+        vl = val(model, device, val_loader)
+        es(tl, vl)
+        if es.early_stop:
+            break
     test(model, device, test_loader)
 
     if args.save_model:
