@@ -2,27 +2,17 @@ import argparse
 import torch
 from torchvision import datasets, transforms
 import os
+from dataset import get_train_val_loader
 
 
-log_dir = '../data'
+log_dir = '../../data'
 
 def save(file_name, data):
         file_name = os.path.join(log_dir, file_name)
         torch.save(data.cpu(), file_name)
 
 def make_data():
-    train_kwargs = {'batch_size': 5000, 'shuffle':True}
-
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            (0.5, 0.5, 0.5), 
-            (0.5, 0.5, 0.5))
-    ])
-    
-    dataset1 = datasets.CIFAR10('../data/', train=True, download=True,
-                       transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
+    train_loader, _ = get_train_val_loader(5000)
 
     for c in range(10):
         print(f'#### Class {c} ####')
