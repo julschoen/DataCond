@@ -35,7 +35,7 @@ def val(model, device, val_loader):
     val_loss /= len(val_loader.dataset)
     return val_loss
 
-def test(model, device, test_loader):
+def test(model, device, test_loader, print=False):
     model.eval()
     test_loss = 0
     correct = 0
@@ -49,10 +49,12 @@ def test(model, device, test_loader):
             correct += pred.eq(target.view_as(pred)).sum().item()
 
     test_loss /= len(test_loader.dataset)
-
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    acc = 100. * correct / len(test_loader.dataset)
+    if print:
+        print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+            test_loss, correct, len(test_loader.dataset),
+            acc))
+    return acc
 
 class EarlyStopper():
     def __init__(self, tolerance=5, min_delta=0.1):
