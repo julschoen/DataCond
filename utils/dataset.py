@@ -3,7 +3,7 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.utils.data.sampler import SubsetRandomSampler
 
-def get_train_val_loader(batch_size, val=False, num_workers=4, pin_memory=False):
+def get_train_val_loader(batch_size, val=False):
     
     transform=transforms.Compose([
         transforms.ToTensor(),
@@ -46,11 +46,7 @@ def get_train_val_loader(batch_size, val=False, num_workers=4, pin_memory=False)
     return (train_loader, valid_loader)
 
 
-def get_test_loader(batch_size,
-                    shuffle=True,
-                    num_workers=4,
-                    pin_memory=False):
-
+def get_test_loader(batch_size, shuffle=True):
     transform=transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(
@@ -64,8 +60,7 @@ def get_test_loader(batch_size,
     )
 
     data_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, shuffle=shuffle,
-        num_workers=num_workers, pin_memory=pin_memory,
+        dataset, batch_size=batch_size, shuffle=shuffle
     )
 
     return data_loader
