@@ -55,7 +55,7 @@ def test(model, device, test_loader):
         100. * correct / len(test_loader.dataset)))
 
 class EarlyStopper():
-    def __init__(self, tolerance=5, min_delta=1):
+    def __init__(self, tolerance=5, min_delta=0.1):
         self.tolerance = tolerance
         self.min_delta = min_delta
         self.counter = 0
