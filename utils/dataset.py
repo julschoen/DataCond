@@ -68,6 +68,3 @@ def get_test_loader(batch_size,
     )
 
     return data_loader
-
-if __name__ == '__main__':
-    get_train_val_loader(512)
