@@ -5,7 +5,7 @@ import torch
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
     train_loss = 0
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.CrossEntropyLoss(reduction='sum')
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
