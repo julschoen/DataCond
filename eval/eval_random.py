@@ -62,7 +62,7 @@ def main():
             model = ConvNet(args).to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
             es = EarlyStopper()
-            for epoch in range(1, 200):
+            for epoch in range(1, 1000):
                 tl = train(args, model, device, train_loader, optimizer, epoch)
                 vl = val(model, device, val_loader)
                 es(tl, vl)
@@ -74,7 +74,7 @@ def main():
             model = ResNet18().to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
             es = EarlyStopper()
-            for epoch in range(1, 200):
+            for epoch in range(1, 1000):
                 tl = train(args, model, device, train_loader, optimizer, epoch)
                 vl = val(model, device, val_loader)
                 es(tl, vl)
@@ -86,7 +86,7 @@ def main():
             model = SimpleNet(in_dim=32*32*3).to(device)
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
             es = EarlyStopper()
-            for epoch in range(1, 200):
+            for epoch in range(1, 1000):
                 tl = train(args, model, device, train_loader, optimizer, epoch)
                 vl = val(model, device, val_loader)
                 es(tl, vl)
