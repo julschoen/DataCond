@@ -41,7 +41,7 @@ def get_train_val_loader(batch_size, valid_size=0.1, num_workers=4, pin_memory=F
     val_idx = torch.load('../../data/val_id.pt')
 
     train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(valid_idx)
+    valid_sampler = SubsetRandomSampler(val_idx)
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, sampler=train_sampler,
