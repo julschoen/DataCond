@@ -3,7 +3,7 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.utils.data.sampler import SubsetRandomSampler
 
-def get_train_val_loader(batch_size, valid_size=0.1, num_workers=4, pin_memory=False):
+def get_train_val_loader(batch_size, val=False, num_workers=4, pin_memory=False):
     
     transform=transforms.Compose([
         transforms.ToTensor(),
@@ -20,27 +20,28 @@ def get_train_val_loader(batch_size, valid_size=0.1, num_workers=4, pin_memory=F
         transform=transform,
     )
 
-    valid_dataset = datasets.CIFAR10(
-        root="../../data",
-        train=True,
-        download=True,
-        transform=transform,
-    )
-
+    
     train_idx= torch.load('../../data/train_id.pt')
-    val_idx = torch.load('../../data/val_id.pt')
-
     train_sampler = SubsetRandomSampler(train_idx)
-    valid_sampler = SubsetRandomSampler(val_idx)
 
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, sampler=train_sampler,
-        num_workers=num_workers, pin_memory=pin_memory,
+        train_dataset, batch_size=batch_size, sampler=train_sampler
     )
-    valid_loader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=batch_size, sampler=valid_sampler,
-        num_workers=num_workers, pin_memory=pin_memory,
-    )
+
+    if val:
+        valid_dataset = datasets.CIFAR10(
+            root="../../data",
+            train=True,
+            download=True,
+            transform=transform,
+        )
+        val_idx = torch.load('../../data/val_id.pt')
+        valid_sampler = SubsetRandomSampler(val_idx)
+        valid_loader = torch.utils.data.DataLoader(
+            valid_dataset, batch_size=batch_size, sampler=valid_sampler
+        )
+    else:
+        valid_loader=None
 
     return (train_loader, valid_loader)
 
