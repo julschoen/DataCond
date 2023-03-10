@@ -1,16 +1,16 @@
 import numpy as np
 import torch
-import torch.nn.functional as F
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
     train_loss = 0
+    criterion = torch.nn.CrossEntropyLoss()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        loss = criterion(output, target)
         loss.backward()
         optimizer.step()
         train_loss = train_loss + loss.detach()
@@ -22,12 +22,15 @@ def train(args, model, device, train_loader, optimizer, epoch):
 def val(model, device, val_loader):
     model.eval()
     val_loss = 0
+    correct = 0
+    criterion = torch.nn.CrossEntropyLoss()
     with torch.no_grad():
         for data, target in val_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            val_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            val_loss += criterion(output, target, reduction='sum').item()  # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
     val_loss /= len(val_loader.dataset)
     return val_loss
@@ -36,11 +39,12 @@ def test(model, device, test_loader):
     model.eval()
     test_loss = 0
     correct = 0
+    criterion = torch.nn.CrossEntropyLoss()
     with torch.no_grad():
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            test_loss += criterion(output, target, reduction='sum').item()  # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
 
