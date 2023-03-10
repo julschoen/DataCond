@@ -2,7 +2,6 @@ import torch
 from torchvision import datasets
 from torchvision import transforms
 from torch.utils.data.sampler import SubsetRandomSampler
-import numpy as np
 
 def get_train_val_loader(batch_size, valid_size=0.1, num_workers=4, pin_memory=False):
     
@@ -27,15 +26,6 @@ def get_train_val_loader(batch_size, valid_size=0.1, num_workers=4, pin_memory=F
         download=True,
         transform=transform,
     )
-
-    num_train = len(train_dataset)
-    indices = torch.randperm(num_train)
-    split = int(np.floor(valid_size * num_train))
-
-    train_idx, val_idx = indices[split:], indices[:split]
-
-    torch.save(train_idx, '../../data/train_id.pt')
-    torch.save(val_idx, '../../data/val_id.pt')
 
     train_idx= torch.load('../../data/train_id.pt')
     val_idx = torch.load('../../data/val_id.pt')
