@@ -2,6 +2,9 @@ import argparse
 import torch
 from torchvision import datasets, transforms
 import os
+sys.path.append("../") 
+
+from utils.dataset import get_train_loader
 
 
 comp_dir = '../../comparison_synth'
@@ -11,18 +14,7 @@ def save(file_name, data):
         torch.save(data.cpu(), file_name)
 
 def make_random():
-    train_kwargs = {'batch_size': 5000, 'shuffle':True}
-
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            (0.5, 0.5, 0.5), 
-            (0.5, 0.5, 0.5))
-    ])
-    
-    dataset1 = datasets.CIFAR10('../../data/', train=True, download=True,
-                       transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
+    train_loader = get_train_loader(5000)
 
     if not os.path.isdir(comp_dir):
         os.mkdir(comp_dir)

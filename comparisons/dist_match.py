@@ -10,6 +10,7 @@ import sys;
 sys.path.append("../") 
 
 from utils.classifiers import ConvNet
+from utils.dataset import get_train_loader
 
 class Trainer():
     def __init__(self, params, train_loader):
@@ -173,19 +174,7 @@ def main():
 
     args = parser.parse_args()
 
-    train_kwargs = {'batch_size': args.batch_size, 'shuffle':True}
-
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            (0.5, 0.5, 0.5), 
-            (0.5, 0.5, 0.5))
-        ])
-    dataset1 = datasets.CIFAR10('../../data/', train=True, download=True,
-                        transform=transform)
-    
-
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
+    train_loader = get_train_loader(args.batch_size)
 
     trainer = Trainer(args, train_loader)
     trainer.train()

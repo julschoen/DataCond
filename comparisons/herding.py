@@ -5,6 +5,10 @@ import torchvision
 import os
 import argparse
 
+sys.path.append("../") 
+
+from utils.dataset import get_train_loader
+
 def pretrain(model, args, run_num):
     if os.path.isfile(f'res_{run_num}.pt'):
         print('### Loading Pretrained ResNet-18 ###')
@@ -15,17 +19,7 @@ def pretrain(model, args, run_num):
     criterion.__init__()
     opt = torch.optim.Adam(model.parameters(), lr=args.lr)
 
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(
-            (0.5, 0.5, 0.5), 
-            (0.5, 0.5, 0.5)),
-        transforms.Resize(224)
-        ])
-
-    dataset = datasets.CIFAR10('../../data/', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset, batch_size=512, shuffle=True)
-
+    train_loader = get_train_loader(512)
 
     for epoch in range(args.epochs):
         for i, (x,y) in enumerate(train_loader):
