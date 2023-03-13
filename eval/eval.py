@@ -82,7 +82,7 @@ def main():
         vl = val(model, device, val_loader)
         es(vl, model)
         if es.early_stop:
-            model.load_state_dict(es.best_weights)
+            #model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
@@ -95,7 +95,7 @@ def main():
         vl = val(model, device, val_loader)
         es(vl, model)
         if es.early_stop:
-            model.load_state_dict(es.best_weights)
+            #model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
@@ -108,7 +108,7 @@ def main():
         vl = val(model, device, val_loader)
         es(vl, model)
         if es.early_stop:
-            model.load_state_dict(es.best_weights)
+            #model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
