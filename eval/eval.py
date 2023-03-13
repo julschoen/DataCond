@@ -82,6 +82,7 @@ def main():
         vl = val(model, device, val_loader)
         es(tl, vl)
         if es.early_stop:
+            print(epoch)
             break
     test(model, device, test_loader, verbose=True)
 
@@ -105,6 +106,7 @@ def main():
         vl = val(model, device, val_loader)
         es(tl, vl)
         if es.early_stop:
+            print(epoch)
             break
     test(model, device, test_loader, verbose=True)
 
