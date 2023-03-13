@@ -72,7 +72,7 @@ def main():
             conv.append(acc)
 
             model = ResNet18().to(device)
-            optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+            optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
             es = EarlyStopper()
             for epoch in range(1, 1000):
                 tl = train(args, model, device, train_loader, optimizer, epoch)
