@@ -57,7 +57,7 @@ def main():
                 break
         test(model, device, test_loader, verbose=True)
 
-        model = SimpleNet(in_dim=32).to(device)
+        model = SimpleNet(in_dim=32*32*3).to(device)
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         es = EarlyStopper()
         for epoch in range(1, args.epochs + 1):
