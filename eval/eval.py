@@ -21,7 +21,8 @@ def main():
     parser.add_argument('--batch-size', type=int, default=500)
     parser.add_argument('--test-batch-size', type=int, default=1000)
     parser.add_argument('--epochs', type=int, default=30)
-    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--lr_full', type=float, default=0.001)
+    parser.add_argument('--lr', type=float, default=0.0001)
     parser.add_argument('--save-model', type=bool, default=False)
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--train_full', type=bool, default=False)
@@ -36,7 +37,7 @@ def main():
 
     if args.train_full:
         model = ConvNet(args).to(device)
-        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr_full)
         es = EarlyStopper()
         for epoch in range(1, args.epochs + 1):
             tl = train(args, model, device, train_loader, optimizer, epoch)
@@ -47,7 +48,7 @@ def main():
         test(model, device, test_loader, verbose=True)
 
         model = ResNet18().to(device)
-        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr_full)
         es = EarlyStopper()
         for epoch in range(1, args.epochs + 1):
             tl = train(args, model, device, train_loader, optimizer, epoch)
@@ -58,7 +59,7 @@ def main():
         test(model, device, test_loader, verbose=True)
 
         model = SimpleNet(in_dim=32*32*3).to(device)
-        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr_full)
         es = EarlyStopper()
         for epoch in range(1, args.epochs + 1):
             tl = train(args, model, device, train_loader, optimizer, epoch)
@@ -82,20 +83,20 @@ def main():
         vl = val(model, device, val_loader)
         es(vl, model)
         if es.early_stop:
-            #model.load_state_dict(es.best_weights)
+            model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
 
     model = ResNet18().to(device)
-    optimizer = optim.Adam(model.parameters(), lr=1e-4)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
     es = EarlyStopper()
     for epoch in range(1, 200):
         tl = train(args, model, device, train_loader, optimizer, epoch)
         vl = val(model, device, val_loader)
         es(vl, model)
         if es.early_stop:
-            #model.load_state_dict(es.best_weights)
+            model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
@@ -108,7 +109,7 @@ def main():
         vl = val(model, device, val_loader)
         es(vl, model)
         if es.early_stop:
-            #model.load_state_dict(es.best_weights)
+            model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
