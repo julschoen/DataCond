@@ -56,19 +56,27 @@ def test(model, device, test_loader, verbose=False):
             acc))
     return acc
 
+
 class EarlyStopper():
-    def __init__(self, tolerance=5, min_delta=0.1):
-        self.tolerance = tolerance
-        self.min_delta = min_delta
+    def __init__(self, patience=7, delta=0):
+        self.patience = patience
+        self.delta = delta
         self.counter = 0
+        self.best_score = None
+        self.best_weights = None
         self.early_stop = False
-        self.prev_val = 1000000
+        self.val_loss_min = np.Inf
 
-    def __call__(self, train_loss, validation_loss):
-        if (self.prev_val - validation_loss) > self.min_delta:
-            self.counter +=1
-            if self.counter >= self.tolerance:  
+    def __call__(self, val_loss, model):
+        score = -val_loss
+        if self.best_score is None:
+            self.best_score = score
+            self.best_weights = model.state_dict()
+        elif score < self.best_score + self.delta:
+            self.counter += 1
+            if self.counter >= self.patience:
                 self.early_stop = True
-
-        self.prev_val = validation_loss
-
+        else:
+            self.best_score = score
+            self.best_weights = model.state_dict()
+            self.counter = 0

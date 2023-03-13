@@ -80,8 +80,9 @@ def main():
     for epoch in range(1, 200):
         tl = train(args, model, device, train_loader, optimizer, epoch)
         vl = val(model, device, val_loader)
-        es(tl, vl)
+        es(vl, model)
         if es.early_stop:
+            model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
@@ -92,8 +93,9 @@ def main():
     for epoch in range(1, 200):
         tl = train(args, model, device, train_loader, optimizer, epoch)
         vl = val(model, device, val_loader)
-        es(tl, vl)
+        es(vl, model)
         if es.early_stop:
+            model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
@@ -104,8 +106,9 @@ def main():
     for epoch in range(1, 200):
         tl = train(args, model, device, train_loader, optimizer, epoch)
         vl = val(model, device, val_loader)
-        es(tl, vl)
+        es(vl, model)
         if es.early_stop:
+            model.load_state_dict(es.best_weights)
             print(epoch)
             break
     test(model, device, test_loader, verbose=True)
