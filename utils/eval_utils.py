@@ -77,7 +77,7 @@ class EarlyStopper():
             self.counter += 1
             if self.counter >= self.patience:
                 self.early_stop = True
-        else:
+        elif score < self.best_score:
             self.best_score = score
             self.best_weights = model.state_dict()
             self.counter = 0
