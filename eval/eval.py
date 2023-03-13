@@ -44,7 +44,7 @@ def main():
             es(tl, vl)
             if es.early_stop:
                 break
-        test(model, device, test_loader, print=True)
+        test(model, device, test_loader, verbose=True)
 
         model = ResNet18().to(device)
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -55,7 +55,7 @@ def main():
             es(tl, vl)
             if es.early_stop:
                 break
-        test(model, device, test_loader, print=True)
+        test(model, device, test_loader, verbose=True)
 
         model = SimpleNet(in_dim=32).to(device)
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -66,7 +66,7 @@ def main():
             es(tl, vl)
             if es.early_stop:
                 break
-        test(model, device, test_loader, print=True)
+        test(model, device, test_loader, verbose=True)
 
     chkpt = os.path.join(args.log_dir, 'checkpoints')
     targets = torch.load(os.path.join(chkpt,'labels.pt'))
@@ -83,7 +83,7 @@ def main():
         es(tl, vl)
         if es.early_stop:
             break
-    test(model, device, test_loader, print=True)
+    test(model, device, test_loader, verbose=True)
 
     model = ResNet18().to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -94,7 +94,7 @@ def main():
         es(tl, vl)
         if es.early_stop:
             break
-    test(model, device, test_loader, print=True)
+    test(model, device, test_loader, verbose=True)
 
     model = SimpleNet(in_dim=32*32*3).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -105,7 +105,7 @@ def main():
         es(tl, vl)
         if es.early_stop:
             break
-    test(model, device, test_loader, print=True)
+    test(model, device, test_loader, verbose=True)
 
     if args.save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
