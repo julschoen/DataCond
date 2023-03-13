@@ -88,7 +88,7 @@ def main():
     test(model, device, test_loader, verbose=True)
 
     model = ResNet18().to(device)
-    optimizer = optim.Adam(model.parameters(), lr=1e-2)
+    optimizer = optim.Adam(model.parameters(), lr=1e-4)
     es = EarlyStopper()
     for epoch in range(1, 200):
         tl = train(args, model, device, train_loader, optimizer, epoch)
