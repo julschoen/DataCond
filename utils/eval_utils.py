@@ -62,6 +62,7 @@ class EarlyStopper():
         self.min_delta = min_delta
         self.counter = 0
         self.early_stop = False
+        self.prev_val = 1000000
 
     def __call__(self, train_loss, validation_loss):
         if (validation_loss - train_loss) > self.min_delta:
