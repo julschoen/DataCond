@@ -9,7 +9,7 @@ import os
 import sys;
 sys.path.append("../") 
 
-from dataset import get_train_loader
+from utils.dataset import get_train_loader
 
 def main():
     parser = argparse.ArgumentParser(description='DC-VAE')

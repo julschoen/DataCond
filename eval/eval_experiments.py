@@ -9,7 +9,7 @@ import sys;
 sys.path.append("../") 
 
 from utils.classifiers import ConvNet, ResNet18, SimpleNet
-from dataset import get_val_loader, get_test_loader
+from utils.dataset import get_val_loader, get_test_loader
 from utils.eval_utils import EarlyStopper, train, val, test
 
 

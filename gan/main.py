@@ -4,7 +4,7 @@ from torchvision import datasets, transforms
 from cdcgan_train import Trainer
 import sys;
 sys.path.append("../") 
-from dataset import get_train_loader
+from utils.dataset import get_train_loader
 
 def main():
     # Training settings
