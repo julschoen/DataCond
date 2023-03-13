@@ -58,7 +58,7 @@ def test(model, device, test_loader, verbose=False):
 
 
 class EarlyStopper():
-    def __init__(self, patience=5, delta=0.2):
+    def __init__(self, patience=2, delta=0.2):
         self.patience = patience
         self.delta = delta
         self.counter = 0
