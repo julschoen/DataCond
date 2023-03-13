@@ -102,7 +102,7 @@ def main():
     test(model, device, test_loader, verbose=True)
 
     model = SimpleNet(in_dim=32*32*3).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=args.lr*10)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr*100)
     es = EarlyStopper()
     for epoch in range(1, 200):
         tl = train(args, model, device, train_loader, optimizer, epoch)
