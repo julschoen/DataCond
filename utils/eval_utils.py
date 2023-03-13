@@ -68,6 +68,7 @@ class EarlyStopper():
         self.val_loss_min = np.Inf
 
     def __call__(self, val_loss, model):
+        print(val_loss)
         score = -val_loss
         if self.best_score is None:
             self.best_score = score
